@@ -3,12 +3,16 @@ package com.asofterspace.webengine;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import com.asofterspace.toolbox.configuration.ConfigFile;
+
 public class Main {
 	
 	private static JFrame mainWindow;
 	
 
 	public static void main(String[] args) {
+		
+		ConfigFile config = new ConfigFile("settings");
 		
 		createGUI();
 		
