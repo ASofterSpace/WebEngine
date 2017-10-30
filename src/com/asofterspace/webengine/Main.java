@@ -10,7 +10,7 @@ public class Main {
 		
 		ConfigFile config = new ConfigFile("settings");
 		
-		SwingUtilities.invokeLater(new GUI());
+		SwingUtilities.invokeLater(new GUI(config));
 	}
 	
 }

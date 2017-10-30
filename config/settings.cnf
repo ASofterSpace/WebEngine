@@ -1,1 +1,3 @@
-{"pages": [{title: "a softer space"}]}
+{"pages": [
+	{"title": "a softer space", "path": "../ASSwebsite"},
+]}

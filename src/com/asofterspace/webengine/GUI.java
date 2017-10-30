@@ -17,6 +17,9 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
+import com.asofterspace.toolbox.configuration.ConfigFile;
+import com.asofterspace.toolbox.io.JSON;
+
 public class GUI implements Runnable {
 
 	private JFrame mainWindow;
@@ -24,6 +27,13 @@ public class GUI implements Runnable {
 	private String[] pageList;
 	
 	private List<PageTab> pageTabs;
+	
+	private ConfigFile configuration;
+	
+	
+	public GUI(ConfigFile config) {
+		configuration = config;
+	}
 	
 	@Override
 	public void run() {
@@ -73,9 +83,10 @@ public class GUI implements Runnable {
 	    JPanel mainPanel = new JPanel();
 	    mainPanel.setPreferredSize(new Dimension(800, 500));
 	    mainPanel.setLayout(new GridLayout(1, 2));
-	
-		pageList = new String[1];
-		pageList[0] = "a softer space";
+
+	    JPanel mainPanelRight = new JPanel();
+	    String[] pageList = createPageTabs(mainPanelRight);
+	    
 		JList<String> pageListComponent = new JList<String>(pageList);
 		
 		MouseListener pageListClickListener = new MouseListener() {
@@ -112,11 +123,7 @@ public class GUI implements Runnable {
 		};
 		pageListComponent.addMouseListener(pageListClickListener);
 		
-		
 		mainPanel.add(pageListComponent);
-
-	    JPanel mainPanelRight = new JPanel();
-	    createPageTabs(mainPanelRight);
 	    mainPanel.add(mainPanelRight);
 
 		parent.add(mainPanel, BorderLayout.CENTER);
@@ -124,16 +131,27 @@ public class GUI implements Runnable {
 	    return mainPanel;
 	}
 	
-	private void createPageTabs(JPanel parent) {
+	private String[] createPageTabs(JPanel parent) {
 
+	    List<JSON> jsonPages = configuration.getAllContents().getArray("pages");
+
+		pageList = new String[jsonPages.size()];
 		pageTabs = new ArrayList<PageTab>();
-		
-		for (String page : pageList) {
-			
-			PageTab tab = new PageTab(parent, page, ".");
+	    
+		int i = 0;
+	    
+	    for (JSON jsonPage : jsonPages) {
+	    	
+	    	String pageTitle = jsonPage.getString("title");
+	    	
+	    	pageList[i++] = pageTitle;
+
+			PageTab tab = new PageTab(parent, pageTitle, jsonPage.getString("path"));
 			
 			pageTabs.add(tab);
-		}
+	    }
+	    
+	    return pageList;
 	}
 
 	private JPanel createBottomPanel(JFrame parent) {
