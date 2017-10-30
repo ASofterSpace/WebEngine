@@ -146,7 +146,7 @@ public class GUI implements Runnable {
 	    	
 	    	pageList[i++] = pageTitle;
 
-			PageTab tab = new PageTab(parent, pageTitle, jsonPage.getString("path"));
+			PageTab tab = new PageTab(parent, pageTitle, jsonPage.getString("path"), jsonPage.getInteger("version"));
 			
 			pageTabs.add(tab);
 	    }
