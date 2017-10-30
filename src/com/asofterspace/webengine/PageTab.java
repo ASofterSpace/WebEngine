@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.File;
 
 public class PageTab {
@@ -19,12 +20,12 @@ public class PageTab {
 	
 	String path;
 	
-	Integer version;
-	
 	JPanel visualPanel;
 	
+	ConfigFile configuration;
+	
 
-	public PageTab(JPanel parentPanel, String page, String pathToPage, Integer versionOfPage) {
+	public PageTab(JPanel parentPanel, String page, String pathToPage) {
 
 		parent = parentPanel;
 		
@@ -32,11 +33,11 @@ public class PageTab {
 		
 		path = pathToPage;
 		
-		version = versionOfPage;
-		
 		visualPanel = createVisualPanel();
 		
 		parent.add(visualPanel);
+		
+		configuration = new ConfigFile(path + "/webengine.json");
 	}
 	
 	private JPanel createVisualPanel() {
@@ -112,7 +113,13 @@ public class PageTab {
 		
 		content = insertContentText(content);
 		
-		content = insertNewVersion(content);
+		Integer oldVersion = configuration.getInteger("version");
+		
+		Integer newVersion = oldVersion + 1;
+		
+		content = insertNewVersion(content, newVersion);
+		
+		configuration.set("version", newVersion);
 		
 		return content;
 	}
@@ -203,11 +210,8 @@ public class PageTab {
 	 * @param content  a string containing source code
 	 * @return the same string, but with @version placeholders replaced
 	 */
-	private String insertNewVersion(String content) {
+	private String insertNewVersion(String content, Integer version) {
 
-		// TODO :: somehow increment this version, and store the
-		// incremented value back in the configuration file
-		
 		while (content.contains("@version")) {
 			content = content.replaceAll("@version", ""+version);
 		}
