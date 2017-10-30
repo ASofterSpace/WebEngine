@@ -1,8 +1,13 @@
 package com.asofterspace.webengine;
 
+import java.awt.Desktop;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -11,6 +16,7 @@ import javax.swing.JPanel;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.File;
+import com.asofterspace.toolbox.io.JSON;
 
 public class PageTab {
 
@@ -98,6 +104,16 @@ public class PageTab {
 		File indexOut = new File(path + "/index.htm");
 		
 		indexOut.saveContent(content);
+
+		try {
+			String absolutePath = new java.io.File(path + "/index.htm").getCanonicalPath().toString().replace("\\", "/");
+
+			if (Desktop.isDesktopSupported()) {
+					Desktop.getDesktop().browse(new URI("file:///" + absolutePath));
+			}
+		} catch (IOException | URISyntaxException e) {
+			System.err.println("[ERROR] trying to open the preview in a browser resulted in an I/O Exception - not quite inconceivable!");
+		}
 	}
 
 	/**
@@ -199,7 +215,24 @@ public class PageTab {
 	 */
 	private String insertContentText(String content) {
 		
-		// TODO
+		JSON contentConfig = configuration.getAllContents().get("content");
+		
+		while (content.contains("@content(")) {
+			
+			int atIndex = content.indexOf("@content(");
+			
+			String beforeContent = content.substring(0, atIndex);
+			
+			String contentKey = content.substring(atIndex + 9, content.length());
+			
+			atIndex = contentKey.indexOf(")");
+			
+			String afterContent = contentKey.substring(atIndex + 1);
+			
+			contentKey = contentKey.substring(0, atIndex);
+			
+			content = beforeContent + contentConfig.getString(contentKey) + afterContent;
+		}
 		
 		return content;
 	}
