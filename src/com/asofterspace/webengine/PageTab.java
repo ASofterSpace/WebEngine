@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
+import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.JSON;
 
@@ -57,6 +58,10 @@ public class PageTab {
 		JLabel pathLabel = new JLabel("Path: " + path);
 		tab.add(pathLabel);
 
+		JPanel buttonRow = new JPanel();
+		buttonRow.setLayout(new GridLayout(1, 2));
+		tab.add(buttonRow);
+
 	    JButton previewButton = new JButton("Preview");
 	    previewButton.addActionListener(new ActionListener()
 	    {
@@ -65,7 +70,17 @@ public class PageTab {
 	        performPreview();
 	      }
 	    });
-	    tab.add(previewButton);
+	    buttonRow.add(previewButton);
+
+	    JButton compileButton = new JButton("Compile");
+	    compileButton.addActionListener(new ActionListener()
+	    {
+	      public void actionPerformed(ActionEvent e)
+	      {
+	        performCompile();
+	      }
+	    });
+	    buttonRow.add(compileButton);
 
 		tab.setVisible(false);
 
@@ -101,19 +116,32 @@ public class PageTab {
 		
 		content = removePhp(content);
 		
-		File indexOut = new File(path + "/index.htm");
+		String newFileName = path + "/index.htm";
+		
+		File indexOut = new File(newFileName);
 		
 		indexOut.saveContent(content);
+		
+		openPreviewInBrowser(newFileName);
+	}
+	
+	private void performCompile() {
 
-		try {
-			String absolutePath = new java.io.File(path + "/index.htm").getCanonicalPath().toString().replace("\\", "/");
+		File indexIn = new File(path + "/index.php");
+		
+		String content = indexIn.getContent();
 
-			if (Desktop.isDesktopSupported()) {
-					Desktop.getDesktop().browse(new URI("file:///" + absolutePath));
-			}
-		} catch (IOException | URISyntaxException e) {
-			System.err.println("[ERROR] trying to open the preview in a browser resulted in an I/O Exception - not quite inconceivable!");
-		}
+		content = compilePhp(content);
+		
+		String compiledDirPath = path + "/compiled";
+		
+		Directory compiledDir = new Directory(compiledDirPath);
+		
+		compiledDir.clear();
+		
+		File indexOut = new File(compiledDirPath + "/index.php");
+		
+		indexOut.saveContent(content);
 	}
 
 	/**
@@ -252,4 +280,17 @@ public class PageTab {
 		return content;
 	}
 
+	private void openPreviewInBrowser(String previewFileName) {
+
+		try {
+			String absolutePath = new java.io.File(previewFileName).getCanonicalPath().toString().replace("\\", "/");
+
+			if (Desktop.isDesktopSupported()) {
+					Desktop.getDesktop().browse(new URI("file:///" + absolutePath));
+			}
+		} catch (IOException | URISyntaxException e) {
+			System.err.println("[ERROR] trying to open the preview in a browser resulted in an I/O Exception - not quite inconceivable!");
+		}
+	}
+	
 }
