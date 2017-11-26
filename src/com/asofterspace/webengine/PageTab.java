@@ -7,8 +7,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -17,7 +15,7 @@ import javax.swing.JPanel;
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
-import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.web.JSON;
 
 public class PageTab {
 
@@ -59,7 +57,9 @@ public class PageTab {
 		tab.add(pathLabel);
 
 		JPanel buttonRow = new JPanel();
-		buttonRow.setLayout(new GridLayout(1, 2));
+		GridLayout buttonRowLayout = new GridLayout(1, 2);
+		buttonRowLayout.setHgap(10);
+		buttonRow.setLayout(buttonRowLayout);
 		tab.add(buttonRow);
 
 	    JButton previewButton = new JButton("Preview");

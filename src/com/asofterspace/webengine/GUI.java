@@ -18,7 +18,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
-import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.web.JSON;
 
 public class GUI implements Runnable {
 
