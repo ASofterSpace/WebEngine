@@ -1,9 +1,8 @@
 cd src\com\asofterspace
 
-rmdir /s /q toolbox
+rd /s /q toolbox
 
 md toolbox
-
 cd toolbox
 
 md configuration
