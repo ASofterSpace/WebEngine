@@ -87,7 +87,7 @@ public class GUI implements Runnable {
 	    JPanel mainPanelRight = new JPanel();
 	    String[] pageList = createPageTabs(mainPanelRight);
 	    
-		JList<String> pageListComponent = new JList<String>(pageList);
+		final JList<String> pageListComponent = new JList<String>(pageList);
 		
 		MouseListener pageListClickListener = new MouseListener() {
 			

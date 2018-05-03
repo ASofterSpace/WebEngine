@@ -16,6 +16,8 @@ copy "..\Toolbox-Java\src\com\asofterspace\toolbox\configuration\*.*" "src\com\a
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\io\*.*" "src\com\asofterspace\toolbox\io"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\web\*.*" "src\com\asofterspace\toolbox\web"
 
+rd /s /q bin
+
 md bin
 
 cd src
@@ -23,9 +25,5 @@ cd src
 dir /s /B *.java > sourcefiles.list
 
 javac -d ../bin @sourcefiles.list
-
-cd com\asofterspace
-
-rmdir /s /q toolbox
 
 pause
