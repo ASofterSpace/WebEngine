@@ -29,3 +29,6 @@ src/sourcefiles.list
 
 # external dependencies (with their own repositories and life cycles)
 src/com/asofterspace/toolbox
+
+# config files
+config
