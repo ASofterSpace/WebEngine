@@ -46,7 +46,7 @@ public class GUI implements Runnable {
 	private void createGUI() {
 		
 		// Create the window
-		mainWindow = new JFrame("WebEngine");
+		mainWindow = new JFrame(Main.PROGRAM_TITLE);
 
 		// Add content to the window
 		createTopPanel(mainWindow);
@@ -70,7 +70,7 @@ public class GUI implements Runnable {
 	    JPanel topPanel = new JPanel();
 	    topPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 	    
-		JLabel label = new JLabel("I am the webengine - meow!");
+		JLabel label = new JLabel(Main.PROGRAM_TITLE + " version " + Main.VERSION_NUMBER + " from " + Main.VERSION_DATE);
 		topPanel.add(label);
 
 		parent.add(topPanel, BorderLayout.PAGE_START);
