@@ -119,7 +119,7 @@ public class PageTab {
 
 			File indexIn = new File(path + "/" + currentFile);
 
-			String newFileName = path + "/previews/" + currentFile;
+			String newFileName = path + "/" + targetDir + "/" + currentFile;
 
 			String content = indexIn.getContent();
 
