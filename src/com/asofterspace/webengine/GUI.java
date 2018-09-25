@@ -1,5 +1,8 @@
 package com.asofterspace.webengine;
 
+import com.asofterspace.toolbox.configuration.ConfigFile;
+import com.asofterspace.toolbox.io.JSON;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -17,8 +20,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
-import com.asofterspace.toolbox.configuration.ConfigFile;
-import com.asofterspace.toolbox.web.JSON;
 
 public class GUI implements Runnable {
 
@@ -27,6 +28,8 @@ public class GUI implements Runnable {
 	private String[] pageList;
 	
 	private List<PageTab> pageTabs;
+	
+	private JList<String> pageListComponent;
 	
 	private ConfigFile configuration;
 	
@@ -87,22 +90,13 @@ public class GUI implements Runnable {
 	    JPanel mainPanelRight = new JPanel();
 	    String[] pageList = createPageTabs(mainPanelRight);
 	    
-		final JList<String> pageListComponent = new JList<String>(pageList);
+		pageListComponent = new JList<String>(pageList);
 		
 		MouseListener pageListClickListener = new MouseListener() {
 			
 			@Override
 		    public void mouseClicked(MouseEvent e) {
-
-		         String selectedItem = (String) pageListComponent.getSelectedValue();
-
-		         for (PageTab tab : pageTabs) {
-		        	 if (tab.isItem(selectedItem)) {
-		        		 tab.show();
-		        	 } else {
-		        		 tab.hide();
-		        	 }
-		         }
+				showSelectedTab();
 		    }
 
 			@Override
@@ -115,10 +109,12 @@ public class GUI implements Runnable {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				showSelectedTab();
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
+				showSelectedTab();
 			}
 		};
 		pageListComponent.addMouseListener(pageListClickListener);
@@ -129,6 +125,19 @@ public class GUI implements Runnable {
 		parent.add(mainPanel, BorderLayout.CENTER);
 		
 	    return mainPanel;
+	}
+	
+	private void showSelectedTab() {
+
+		String selectedItem = (String) pageListComponent.getSelectedValue();
+
+		for (PageTab tab : pageTabs) {
+			if (tab.isItem(selectedItem)) {
+				tab.show();
+			} else {
+				tab.hide();
+			}
+		}
 	}
 	
 	private String[] createPageTabs(JPanel parent) {

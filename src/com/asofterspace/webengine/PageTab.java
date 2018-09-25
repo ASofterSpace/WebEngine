@@ -1,5 +1,10 @@
 package com.asofterspace.webengine;
 
+import com.asofterspace.toolbox.configuration.ConfigFile;
+import com.asofterspace.toolbox.io.Directory;
+import com.asofterspace.toolbox.io.File;
+import com.asofterspace.toolbox.io.JSON;
+
 import java.awt.Desktop;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -12,41 +17,37 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.asofterspace.toolbox.configuration.ConfigFile;
-import com.asofterspace.toolbox.io.Directory;
-import com.asofterspace.toolbox.io.File;
-import com.asofterspace.toolbox.web.JSON;
 
 public class PageTab {
 
 	JPanel parent;
 
 	String title;
-	
+
 	String path;
-	
+
 	JPanel visualPanel;
-	
+
 	ConfigFile configuration;
-	
+
 
 	public PageTab(JPanel parentPanel, String page, String pathToPage) {
 
 		parent = parentPanel;
-		
+
 		title = page;
-		
+
 		path = pathToPage;
-		
+
 		visualPanel = createVisualPanel();
-		
+
 		parent.add(visualPanel);
-		
+
 		configuration = new ConfigFile(path + "/webengine.json");
 	}
-	
+
 	private JPanel createVisualPanel() {
-		
+
 		JPanel tab = new JPanel();
 		tab.setLayout(new GridLayout(4, 1));
 
@@ -92,7 +93,7 @@ public class PageTab {
 		if (title == null) {
 			return false;
 		}
-		
+
 		return title.equals(item);
 	}
 
@@ -105,43 +106,50 @@ public class PageTab {
 
 		visualPanel.setVisible(false);
 	}
-	
-	private void performPreview() {
-		
-		File indexIn = new File(path + "/index.php");
-		
-		String content = indexIn.getContent();
-		
-		content = compilePhp(content);
-		
-		content = removePhp(content);
-		
-		String newFileName = path + "/index.htm";
-		
-		File indexOut = new File(newFileName);
-		
-		indexOut.saveContent(content);
-		
-		openPreviewInBrowser(newFileName);
+
+	private void compileTo(String targetDir, boolean convertPhpToHtm) {
+
+		JSON files = configuration.getAllContents().get("files");
+
+		int fileAmount = files.getLength();
+
+		for (int i = 0; i < fileAmount; i++) {
+
+			String currentFile = files.getString(i);
+
+			File indexIn = new File(path + "/" + currentFile);
+
+			String newFileName = path + "/previews/" + currentFile;
+
+			String content = indexIn.getContent();
+
+			if (currentFile.endsWith(".php")) {
+
+				content = compilePhp(content);
+
+				content = removePhp(content);
+
+				if (convertPhpToHtm) {
+					newFileName = newFileName.substring(0, newFileName.length() - 4) + ".htm";
+				}
+			}
+
+			File indexOut = new File(newFileName);
+
+			indexOut.saveContent(content);
+		}
 	}
-	
+
+	private void performPreview() {
+
+		compileTo("previews", true);
+
+		openPreviewInBrowser(path + "/previews/index.htm");
+	}
+
 	private void performCompile() {
 
-		File indexIn = new File(path + "/index.php");
-		
-		String content = indexIn.getContent();
-
-		content = compilePhp(content);
-		
-		String compiledDirPath = path + "/compiled";
-		
-		Directory compiledDir = new Directory(compiledDirPath);
-		
-		compiledDir.clear();
-		
-		File indexOut = new File(compiledDirPath + "/index.php");
-		
-		indexOut.saveContent(content);
+		compileTo("compiled", false);
 	}
 
 	/**
@@ -152,22 +160,22 @@ public class PageTab {
 	private String compilePhp(String content) {
 
 		content = removeTemplatingComments(content);
-		
+
 		content = removeWhitespaceAndEmptyLines(content);
-		
+
 		content = insertContentText(content);
-		
+
 		Integer oldVersion = configuration.getInteger("version");
-		
+
 		Integer newVersion = oldVersion + 1;
-		
+
 		content = insertNewVersion(content, newVersion);
-		
+
 		configuration.set("version", newVersion);
-		
+
 		return content;
 	}
-	
+
 	/**
 	 * Removes all PHP tags from a PHP file to convert it into
 	 * regular HTML, e.g. for local previews
@@ -175,9 +183,9 @@ public class PageTab {
 	 * @return the same string without the PHP tags and their contents
 	 */
 	private String removePhp(String content) {
-		
+
 		// TODO
-		
+
 		return content;
 	}
 
@@ -190,18 +198,18 @@ public class PageTab {
 	private String removeTemplatingComments(String content) {
 
 		while (content.contains("{{--")) {
-			
+
 			String contentBefore = content.substring(0, content.indexOf("{{--"));
-			
+
 			String contentAfter = content.substring(content.indexOf("{{--"));
 			contentAfter = contentAfter.substring(contentAfter.indexOf("--}}") + 4);
-			
+
 			content = contentBefore + contentAfter;
 		}
-		
+
 		return content;
 	}
-	
+
 	/**
 	 * Takes a string containing source code and removes starting and
 	 * trailing spaces as well as excessive newlines
@@ -213,7 +221,7 @@ public class PageTab {
 		while (content.startsWith(" ")) {
 			content = content.substring(1);
 		}
-		
+
 		while (content.contains(" \n") || content.contains("\t\n")) {
 			content = content.replaceAll(" \n", "\n");
 			content = content.replaceAll("\t\n", "\n");
@@ -242,26 +250,26 @@ public class PageTab {
 	 * @return the same string, but with placeholders filled
 	 */
 	private String insertContentText(String content) {
-		
+
 		JSON contentConfig = configuration.getAllContents().get("content");
-		
+
 		while (content.contains("@content(")) {
-			
+
 			int atIndex = content.indexOf("@content(");
-			
+
 			String beforeContent = content.substring(0, atIndex);
-			
+
 			String contentKey = content.substring(atIndex + 9, content.length());
-			
+
 			atIndex = contentKey.indexOf(")");
-			
+
 			String afterContent = contentKey.substring(atIndex + 1);
-			
+
 			contentKey = contentKey.substring(0, atIndex);
-			
+
 			content = beforeContent + contentConfig.getString(contentKey) + afterContent;
 		}
-		
+
 		return content;
 	}
 
@@ -276,7 +284,7 @@ public class PageTab {
 		while (content.contains("@version")) {
 			content = content.replaceAll("@version", ""+version);
 		}
-		
+
 		return content;
 	}
 
@@ -292,5 +300,5 @@ public class PageTab {
 			System.err.println("[ERROR] trying to open the preview in a browser resulted in an I/O Exception - not quite inconceivable!");
 		}
 	}
-	
+
 }
