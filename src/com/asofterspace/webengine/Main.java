@@ -10,8 +10,8 @@ import javax.swing.SwingUtilities;
 public class Main {
 	
 	public final static String PROGRAM_TITLE = "WebEngine";
-	public final static String VERSION_NUMBER = "0.0.0.3(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "4. October 2017 - 25. September 2018";
+	public final static String VERSION_NUMBER = "0.0.0.4(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "4. October 2017 - 17. October 2018";
 	
 	public static void main(String[] args) {
 		

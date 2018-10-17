@@ -106,6 +106,22 @@ public class PageTab {
 
 		visualPanel.setVisible(false);
 	}
+	
+	/**
+	 * Returns true for PHP, Javascript, CSS, etc. files
+	 * Returns false otherwise - e.g. for JPEG files
+	 */
+	private boolean isWebTextFile(File currentFile) {
+	
+		String path = currentFile.getFilename().toLowerCase();
+
+		return path.endsWith(".php") ||
+			   path.endsWith(".js") ||
+			   path.endsWith(".json") ||
+			   path.endsWith(".htm") ||
+			   path.endsWith(".html") ||
+			   path.endsWith(".css");
+	}
 
 	private void compileTo(String targetDir, boolean convertPhpToHtm) {
 
@@ -121,22 +137,30 @@ public class PageTab {
 
 			String newFileName = path + "/" + targetDir + "/" + currentFile;
 
-			String content = indexIn.getContent();
+			if (isWebTextFile(indexIn)) {
+			
+				String content = indexIn.getContent();
 
-			if (currentFile.endsWith(".php")) {
+				if (currentFile.endsWith(".php")) {
 
-				content = compilePhp(content);
+					content = compilePhp(content);
 
-				content = removePhp(content);
+					content = removePhp(content);
 
-				if (convertPhpToHtm) {
-					newFileName = newFileName.substring(0, newFileName.length() - 4) + ".htm";
+					if (convertPhpToHtm) {
+						newFileName = newFileName.substring(0, newFileName.length() - 4) + ".htm";
+					}
 				}
+				
+				File indexOut = new File(newFileName);
+
+				indexOut.saveContent(content);
+				
+			} else {
+
+				indexIn.copyToDisk(new File(newFileName));
 			}
 
-			File indexOut = new File(newFileName);
-
-			indexOut.saveContent(content);
 		}
 	}
 
