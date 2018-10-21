@@ -138,16 +138,16 @@ public class PageTab {
 			String newFileName = path + "/" + targetDir + "/" + currentFile;
 
 			if (isWebTextFile(indexIn)) {
-			
+
 				String content = indexIn.getContent();
 
 				if (currentFile.endsWith(".php")) {
 
 					content = compilePhp(content);
 
-					content = removePhp(content);
-
 					if (convertPhpToHtm) {
+						content = removePhp(content);
+
 						newFileName = newFileName.substring(0, newFileName.length() - 4) + ".htm";
 					}
 				}
@@ -182,21 +182,29 @@ public class PageTab {
 	 * @return the same string after templating
 	 */
 	private String compilePhp(String content) {
-
+	
+		// first of all, remove templating comments - so if someone has {{-- @include(bla) --}}, then do not even include
 		content = removeTemplatingComments(content);
 
+		// now perform the templating (meaning to actually follow up on those @includes)
+		content = performTemplating(content);
+
+		// aaaand remove comments again
+		content = removeTemplatingComments(content);
+
+		// remove whitespace and empty lines please!
 		content = removeWhitespaceAndEmptyLines(content);
 
+		// insert special content texts
 		content = insertContentText(content);
 
+		// insert version
 		Integer oldVersion = configuration.getInteger("version");
-
 		Integer newVersion = oldVersion + 1;
-
 		content = insertNewVersion(content, newVersion);
-
 		configuration.set("version", newVersion);
 
+		// return result
 		return content;
 	}
 
@@ -208,8 +216,44 @@ public class PageTab {
 	 */
 	private String removePhp(String content) {
 
-		// TODO
+		// TODO :: improve (right now, this ignores comments, strings etc.)
+		
+		while (content.contains("<?php")) {
 
+			String contentBefore = content.substring(0, content.indexOf("<?php"));
+
+			String contentAfter = content.substring(content.indexOf("<?php"));
+			contentAfter = contentAfter.substring(contentAfter.indexOf("?>") + 2);
+
+			content = contentBefore + contentAfter;
+		}
+
+		return content;
+	}
+	
+	/**
+	 * Takes a file content containing @include(xyz) and replaces
+	 * this with the content of xyz; continues as long as @include
+	 * is present (so this can be done recursively, however infinite
+	 * loops are not checked and will result in infinite running
+	 * without a regular way to abort... oops!)
+	 */
+	private String performTemplating(String content) {
+	
+		while (content.contains("@include(")) {
+		
+			String contentBefore = content.substring(0, content.indexOf("@include("));
+
+			String contentAfter = content.substring(content.indexOf("@include("));
+			String contentMiddle = contentAfter.substring(9);
+			contentMiddle = contentMiddle.substring(0, contentMiddle.indexOf(")"));
+			contentAfter = contentAfter.substring(contentAfter.indexOf(")") + 1);
+
+			File includedFile = new File(path + "/" + contentMiddle);
+
+			content = contentBefore + includedFile.getContent() + contentAfter;
+		}
+		
 		return content;
 	}
 
