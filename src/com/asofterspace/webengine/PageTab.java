@@ -227,6 +227,9 @@ public class PageTab {
 
 			content = contentBefore + contentAfter;
 		}
+		
+		// also replace xyz.php links with xyz.htm links (such that local links also work within the preview)
+		content = content.replaceAll(".php", ".htm");
 
 		return content;
 	}
