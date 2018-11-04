@@ -4,6 +4,7 @@ import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.web.WebPreviewer;
 
 import java.awt.Desktop;
 import java.awt.GridLayout;
@@ -168,7 +169,7 @@ public class PageTab {
 
 		compileTo("previews", true);
 
-		openPreviewInBrowser(path + "/previews/index.htm");
+		WebPreviewer.openLocalFileInBrowser(path + "/previews/index.htm");
 	}
 
 	private void performCompile() {
@@ -358,18 +359,4 @@ public class PageTab {
 
 		return content;
 	}
-
-	private void openPreviewInBrowser(String previewFileName) {
-
-		try {
-			String absolutePath = new java.io.File(previewFileName).getCanonicalPath().toString().replace("\\", "/");
-
-			if (Desktop.isDesktopSupported()) {
-					Desktop.getDesktop().browse(new URI("file:///" + absolutePath));
-			}
-		} catch (IOException | URISyntaxException e) {
-			System.err.println("[ERROR] trying to open the preview in a browser resulted in an I/O Exception - not quite inconceivable!");
-		}
-	}
-
 }
