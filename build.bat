@@ -1,3 +1,8 @@
+IF NOT EXIST ..\Toolbox-Java\ (
+	echo "It looks like you did not yet get the Toolbox-Java project - please do so (and put it as a folder next to the CDM Script Editor folder.)"
+	EXIT
+)
+
 cd src\com\asofterspace
 
 rd /s /q toolbox
@@ -26,6 +31,8 @@ cd src
 
 dir /s /B *.java > sourcefiles.list
 
-javac -d ../bin @sourcefiles.list
+javac -encoding utf8 -d ../bin @sourcefiles.list
+
+cd ..
 
 pause
