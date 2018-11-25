@@ -4,7 +4,7 @@ import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.JSON;
-import com.asofterspace.toolbox.web.WebPreviewer;
+import com.asofterspace.toolbox.gui.WebPreviewer;
 
 import java.awt.Desktop;
 import java.awt.GridLayout;
