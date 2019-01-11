@@ -1,9 +1,14 @@
-package com.asofterspace.webengine;
+/**
+ * Unlicensed code created by A Softer Space, 2019
+ * www.asofterspace.com/licenses/unlicense.txt
+ */
+ package com.asofterspace.webengine;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.io.SimpleFile;
 import com.asofterspace.toolbox.gui.WebPreviewer;
 
 import java.awt.Desktop;
@@ -134,7 +139,7 @@ public class PageTab {
 
 			String currentFile = files.getString(i);
 
-			File indexIn = new File(path + "/" + currentFile);
+			SimpleFile indexIn = new SimpleFile(path + "/" + currentFile);
 
 			String newFileName = path + "/" + targetDir + "/" + currentFile;
 
@@ -153,7 +158,7 @@ public class PageTab {
 					}
 				}
 				
-				File indexOut = new File(newFileName);
+				SimpleFile indexOut = new SimpleFile(newFileName);
 
 				indexOut.saveContent(content);
 				
@@ -253,7 +258,7 @@ public class PageTab {
 			contentMiddle = contentMiddle.substring(0, contentMiddle.indexOf(")"));
 			contentAfter = contentAfter.substring(contentAfter.indexOf(")") + 1);
 
-			File includedFile = new File(path + "/" + contentMiddle);
+			SimpleFile includedFile = new SimpleFile(path + "/" + contentMiddle);
 
 			content = contentBefore + includedFile.getContent() + contentAfter;
 		}
