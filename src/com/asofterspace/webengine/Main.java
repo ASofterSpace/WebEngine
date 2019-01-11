@@ -1,3 +1,7 @@
+/**
+ * Unlicensed code created by A Softer Space, 2019
+ * www.asofterspace.com/licenses/unlicense.txt
+ */
 package com.asofterspace.webengine;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
@@ -10,8 +14,8 @@ import javax.swing.SwingUtilities;
 public class Main {
 	
 	public final static String PROGRAM_TITLE = "WebEngine";
-	public final static String VERSION_NUMBER = "0.0.0.5(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "4. October 2017 - 21. October 2018";
+	public final static String VERSION_NUMBER = "0.0.0.6(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "4. October 2017 - 11. January 2019";
 	
 	public static void main(String[] args) {
 		
