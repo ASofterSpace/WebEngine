@@ -18,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -112,13 +113,13 @@ public class PageTab {
 
 		visualPanel.setVisible(false);
 	}
-	
+
 	/**
 	 * Returns true for PHP, Javascript, CSS, etc. files
 	 * Returns false otherwise - e.g. for JPEG files
 	 */
 	private boolean isWebTextFile(File currentFile) {
-	
+
 		String path = currentFile.getFilename().toLowerCase();
 
 		return path.endsWith(".php") ||
@@ -129,6 +130,9 @@ public class PageTab {
 			   path.endsWith(".css");
 	}
 
+	// keep this as global variable such that isTrue can later on check against it
+	private String currentFile;
+
 	private void compileTo(String targetDir, boolean convertPhpToHtm) {
 
 		JSON files = configuration.getAllContents().get("files");
@@ -137,7 +141,7 @@ public class PageTab {
 
 		for (int i = 0; i < fileAmount; i++) {
 
-			String currentFile = files.getString(i);
+			currentFile = files.getString(i);
 
 			SimpleFile indexIn = new SimpleFile(path + "/" + currentFile);
 
@@ -157,11 +161,11 @@ public class PageTab {
 						newFileName = newFileName.substring(0, newFileName.length() - 4) + ".htm";
 					}
 				}
-				
+
 				SimpleFile indexOut = new SimpleFile(newFileName);
 
 				indexOut.saveContent(content);
-				
+
 			} else {
 
 				indexIn.copyToDisk(new File(newFileName));
@@ -188,7 +192,7 @@ public class PageTab {
 	 * @return the same string after templating
 	 */
 	private String compilePhp(String content) {
-	
+
 		// first of all, remove templating comments - so if someone has {{-- @include(bla) --}}, then do not even include
 		content = removeTemplatingComments(content);
 
@@ -203,6 +207,14 @@ public class PageTab {
 
 		// insert special content texts
 		content = insertContentText(content);
+
+		// insert random numbers
+		content = insertRandomNumbers(content);
+
+		// insert stuff based on ifs (maybe we should move the ifs further up, but then
+		// we would need to check again and again if by e.g. following new templating,
+		// new ifs have been uncovered...)
+		content = insertIfEndIfs(content);
 
 		// insert version
 		Integer oldVersion = configuration.getInteger("version");
@@ -223,7 +235,7 @@ public class PageTab {
 	private String removePhp(String content) {
 
 		// TODO :: improve (right now, this ignores comments, strings etc.)
-		
+
 		while (content.contains("<?php")) {
 
 			String contentBefore = content.substring(0, content.indexOf("<?php"));
@@ -233,13 +245,13 @@ public class PageTab {
 
 			content = contentBefore + contentAfter;
 		}
-		
+
 		// also replace xyz.php links with xyz.htm links (such that local links also work within the preview)
 		content = content.replaceAll(".php", ".htm");
 
 		return content;
 	}
-	
+
 	/**
 	 * Takes a file content containing @include(xyz) and replaces
 	 * this with the content of xyz; continues as long as @include
@@ -248,9 +260,9 @@ public class PageTab {
 	 * without a regular way to abort... oops!)
 	 */
 	private String performTemplating(String content) {
-	
+
 		while (content.contains("@include(")) {
-		
+
 			String contentBefore = content.substring(0, content.indexOf("@include("));
 
 			String contentAfter = content.substring(content.indexOf("@include("));
@@ -262,7 +274,7 @@ public class PageTab {
 
 			content = contentBefore + includedFile.getContent() + contentAfter;
 		}
-		
+
 		return content;
 	}
 
@@ -348,6 +360,94 @@ public class PageTab {
 		}
 
 		return content;
+	}
+
+	private Random randGen;
+
+	private String insertRandomNumbers(String content) {
+
+		while (content.contains("@rand(")) {
+
+			int atIndex = content.indexOf("@rand(");
+
+			String beforeContent = content.substring(0, atIndex);
+
+			String contentKey = content.substring(atIndex + 6, content.length());
+
+			atIndex = contentKey.indexOf(")");
+
+			String afterContent = contentKey.substring(atIndex + 1);
+
+			contentKey = contentKey.substring(0, atIndex);
+
+			int randValue = 0;
+
+			if (randGen == null) {
+				randGen = new Random();
+			}
+
+			try {
+				int maxRand = Integer.parseInt(contentKey);
+				randValue = randGen.nextInt(maxRand + 1);
+
+			} catch (NumberFormatException e) {
+				System.err.println("Tried to interpret @rand(" + contentKey +
+					"), but could not convert " + contentKey + " to integer!");
+			}
+
+			content = beforeContent + randValue + afterContent;
+		}
+
+		return content;
+	}
+
+	private String insertIfEndIfs(String content) {
+
+		while (content.contains("@if(")) {
+
+			int atIndex = content.indexOf("@if(");
+
+			String beforeContent = content.substring(0, atIndex);
+
+			String contentKey = content.substring(atIndex + 4, content.length());
+
+			atIndex = contentKey.indexOf(")");
+
+			String afterContent = contentKey.substring(atIndex + 1);
+
+			contentKey = contentKey.substring(0, atIndex);
+
+			// TODO :: also enable else and elif and stuff like that!
+
+			int endIndex = afterContent.indexOf("@endif");
+
+			if (endIndex < 0) {
+				System.err.println("@if(" + contentKey + ") is not closed!");
+				return content;
+			}
+
+			String middleContent = afterContent.substring(0, endIndex);
+
+			afterContent = afterContent.substring(endIndex + 6);
+
+			if (isTrue(contentKey)) {
+				content = beforeContent + middleContent + afterContent;
+			} else {
+				content = beforeContent + afterContent;
+			}
+		}
+
+		return content;
+	}
+
+	private boolean isTrue(String expression) {
+		if (expression.replace(" ", "").startsWith("page=")) {
+			return expression.replace(" ", "").equals("page=\"" + currentFile + "\"");
+		}
+		if ("true".equals(expression.trim())) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
