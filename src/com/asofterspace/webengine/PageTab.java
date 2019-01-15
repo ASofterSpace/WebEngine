@@ -158,6 +158,8 @@ public class PageTab {
 					if (convertPhpToHtm) {
 						content = removePhp(content);
 
+						content = makeLinksRelative(content);
+
 						newFileName = newFileName.substring(0, newFileName.length() - 4) + ".htm";
 					}
 				}
@@ -248,6 +250,15 @@ public class PageTab {
 
 		// also replace xyz.php links with xyz.htm links (such that local links also work within the preview)
 		content = content.replaceAll(".php", ".htm");
+
+		return content;
+	}
+
+	private String makeLinksRelative(String content) {
+
+		content = content.replaceAll(" href=\"/", " href=\"");
+
+		content = content.replaceAll(" src=\"/", " src=\"");
 
 		return content;
 	}
@@ -388,7 +399,7 @@ public class PageTab {
 
 			try {
 				int maxRand = Integer.parseInt(contentKey);
-				randValue = randGen.nextInt(maxRand + 1);
+				randValue = randGen.nextInt(maxRand);
 
 			} catch (NumberFormatException e) {
 				System.err.println("Tried to interpret @rand(" + contentKey +
