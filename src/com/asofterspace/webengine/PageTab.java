@@ -18,6 +18,8 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import javax.swing.JButton;
@@ -201,22 +203,25 @@ public class PageTab {
 		// now perform the templating (meaning to actually follow up on those @includes)
 		content = performTemplating(content);
 
-		// aaaand remove comments again
+		// aaaand remove comments again, so {{-- --}}
 		content = removeTemplatingComments(content);
 
-		// remove whitespace and empty lines please!
-		content = removeWhitespaceAndEmptyLines(content);
-
-		// insert special content texts
+		// insert special content texts, such as @content(blubb)
 		content = insertContentText(content);
 
-		// insert random numbers
+		// insert random numbers, such as @rand(randnum)
 		content = insertRandomNumbers(content);
+
+		// insert counted numbers, such as @countup(countername)
+		content = insertCountedNumbers(content);
 
 		// insert stuff based on ifs (maybe we should move the ifs further up, but then
 		// we would need to check again and again if by e.g. following new templating,
-		// new ifs have been uncovered...)
+		// new ifs have been uncovered...), such as @if(page="index.php")
 		content = insertIfEndIfs(content);
+
+		// remove whitespace and empty lines please!
+		content = removeWhitespaceAndEmptyLines(content);
 
 		// insert version
 		Integer oldVersion = configuration.getInteger("version");
@@ -412,6 +417,38 @@ public class PageTab {
 		return content;
 	}
 
+	private String insertCountedNumbers(String content) {
+
+		Map<String, Integer> counters = new HashMap<>();
+
+		while (content.contains("@countup(")) {
+
+			int atIndex = content.indexOf("@countup(");
+
+			String beforeContent = content.substring(0, atIndex);
+
+			String contentKey = content.substring(atIndex + 9, content.length());
+
+			atIndex = contentKey.indexOf(")");
+
+			String afterContent = contentKey.substring(atIndex + 1);
+
+			contentKey = contentKey.substring(0, atIndex);
+
+			int counterValue = 0;
+
+			if (counters.containsKey(contentKey)) {
+				counterValue = counters.get(contentKey) + 1;
+			}
+
+			counters.put(contentKey, counterValue);
+
+			content = beforeContent + counterValue + afterContent;
+		}
+
+		return content;
+	}
+
 	private String insertIfEndIfs(String content) {
 
 		while (content.contains("@if(")) {
@@ -454,6 +491,9 @@ public class PageTab {
 	private boolean isTrue(String expression) {
 		if (expression.replace(" ", "").startsWith("page=")) {
 			return expression.replace(" ", "").equals("page=\"" + currentFile + "\"");
+		}
+		if (expression.replace(" ", "").startsWith("page!=")) {
+			return !expression.replace(" ", "").equals("page!=\"" + currentFile + "\"");
 		}
 		if ("true".equals(expression.trim())) {
 			return true;

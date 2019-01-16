@@ -12,13 +12,13 @@ import javax.swing.SwingUtilities;
 
 
 public class Main {
-	
+
 	public final static String PROGRAM_TITLE = "WebEngine";
-	public final static String VERSION_NUMBER = "0.0.0.6(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "4. October 2017 - 11. January 2019";
-	
+	public final static String VERSION_NUMBER = "0.0.0.7(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "4. October 2017 - 16. January 2019";
+
 	public static void main(String[] args) {
-		
+
 		// let the Utils know in what program it is being used
 		Utils.setProgramTitle(PROGRAM_TITLE);
 		Utils.setVersionNumber(VERSION_NUMBER);
@@ -34,5 +34,5 @@ public class Main {
 
 		SwingUtilities.invokeLater(new GUI(config));
 	}
-	
+
 }
