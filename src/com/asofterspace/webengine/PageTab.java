@@ -209,16 +209,18 @@ public class PageTab {
 		// insert special content texts, such as @content(blubb)
 		content = insertContentText(content);
 
-		// insert random numbers, such as @rand(randnum)
-		content = insertRandomNumbers(content);
-
-		// insert counted numbers, such as @countup(countername)
-		content = insertCountedNumbers(content);
-
 		// insert stuff based on ifs (maybe we should move the ifs further up, but then
 		// we would need to check again and again if by e.g. following new templating,
 		// new ifs have been uncovered...), such as @if(page="index.php")
 		content = insertIfEndIfs(content);
+
+		// insert random numbers, such as @rand(randnum)
+		content = insertRandomNumbers(content);
+
+		// insert counted numbers, such as @countup(countername)
+		// (do this after ifEndIfs, such that if stuff was taken out by ifs,
+		// it is not counted)
+		content = insertCountedNumbers(content);
 
 		// remove whitespace and empty lines please!
 		content = removeWhitespaceAndEmptyLines(content);
