@@ -261,7 +261,19 @@ public class PageTab {
 		return content;
 	}
 
+	/**
+	 * Takes in content containing stuff like href="/bla.htm"
+	 * and transforms it into stuff like href="bla.htm" - this
+	 * means that we can display anything that lies on the root
+	 * path very easily locally as a preview (which is nice!),
+	 * but makes it impossible for sub-pages to properly operate
+	 * (oops...)
+	 */
 	private String makeLinksRelative(String content) {
+
+		// if we have href="/", we do not want to set href="",
+		// but instead href="index.htm"
+		content = content.replaceAll(" href=\"/\"", " href=\"index.htm\"");
 
 		content = content.replaceAll(" href=\"/", " href=\"");
 
