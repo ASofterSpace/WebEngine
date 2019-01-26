@@ -211,7 +211,8 @@ public class PageTab {
 
 		// insert stuff based on ifs (maybe we should move the ifs further up, but then
 		// we would need to check again and again if by e.g. following new templating,
-		// new ifs have been uncovered...), such as @if(page="index.php")
+		// new ifs have been uncovered...), such as @if(page="index.php"), @if(page!="index.php"),
+		// and @if(pageStart="index")
 		content = insertIfEndIfs(content);
 
 		// insert random numbers, such as @rand(randnum)
@@ -508,6 +509,12 @@ public class PageTab {
 		}
 		if (expression.replace(" ", "").startsWith("page!=")) {
 			return !expression.replace(" ", "").equals("page!=\"" + currentFile + "\"");
+		}
+		if (expression.replace(" ", "").startsWith("pageStart=")) {
+			return ("pageStart=" + currentFile).startsWith(expression.replace(" ", "").replace("\"", ""));
+		}
+		if (expression.replace(" ", "").startsWith("pageStart!=")) {
+			return !("pageStart!=" + currentFile).startsWith(expression.replace(" ", "").replace("\"", ""));
 		}
 		if ("true".equals(expression.trim())) {
 			return true;
