@@ -135,7 +135,7 @@ public class PageTab {
 	// keep this as global variable such that isTrue can later on check against it
 	private String currentFile;
 
-	private void compileTo(String targetDir, boolean convertPhpToHtm) {
+	private void compileTo(String targetDir, String contentkind, boolean convertPhpToHtm) {
 
 		JSON files = configuration.getAllContents().get("files");
 
@@ -155,7 +155,7 @@ public class PageTab {
 
 				if (currentFile.endsWith(".php")) {
 
-					content = compilePhp(content);
+					content = compilePhp(content, contentkind);
 
 					if (convertPhpToHtm) {
 						content = removePhp(content);
@@ -180,14 +180,16 @@ public class PageTab {
 
 	private void performPreview() {
 
-		compileTo("previews", true);
+		compileTo("previews", "", true);
 
 		WebPreviewer.openLocalFileInBrowser(path + "/previews/index.htm");
 	}
 
 	private void performCompile() {
 
-		compileTo("compiled", false);
+		compileTo("compiled", "", false);
+
+		compileTo("compiledde", "de", false);
 	}
 
 	/**
@@ -195,7 +197,7 @@ public class PageTab {
 	 * @param content  a string containing PHP source code
 	 * @return the same string after templating
 	 */
-	private String compilePhp(String content) {
+	private String compilePhp(String content, String contentkind) {
 
 		// first of all, remove templating comments - so if someone has {{-- @include(bla) --}}, then do not even include
 		content = removeTemplatingComments(content);
@@ -207,7 +209,7 @@ public class PageTab {
 		content = removeTemplatingComments(content);
 
 		// insert special content texts, such as @content(blubb)
-		content = insertContentText(content);
+		content = insertContentText(content, contentkind);
 
 		// insert stuff based on ifs (maybe we should move the ifs further up, but then
 		// we would need to check again and again if by e.g. following new templating,
@@ -369,9 +371,9 @@ public class PageTab {
 	 * @param content  a string containing source code
 	 * @return the same string, but with placeholders filled
 	 */
-	private String insertContentText(String content) {
+	private String insertContentText(String content, String contentkind) {
 
-		JSON contentConfig = configuration.getAllContents().get("content");
+		JSON contentConfig = configuration.getAllContents().get("content" + contentkind);
 
 		while (content.contains("@content(")) {
 
