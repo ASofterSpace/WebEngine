@@ -5,8 +5,8 @@
 package com.asofterspace.webengine;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
-import com.asofterspace.toolbox.Utils;
 import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.Utils;
 
 import javax.swing.SwingUtilities;
 
@@ -14,8 +14,8 @@ import javax.swing.SwingUtilities;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "WebEngine";
-	public final static String VERSION_NUMBER = "0.0.0.7(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "4. October 2017 - 16. January 2019";
+	public final static String VERSION_NUMBER = "0.0.0.8(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "4. October 2017 - 13. April 2019";
 
 	public static void main(String[] args) {
 
