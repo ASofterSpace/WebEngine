@@ -73,22 +73,18 @@ public class PageTab {
 		tab.add(buttonRow);
 
 		JButton previewButton = new JButton("Preview");
-		previewButton.addActionListener(new ActionListener()
-		{
-		  public void actionPerformed(ActionEvent e)
-		  {
-			performPreview();
-		  }
+		previewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				performPreview();
+			}
 		});
 		buttonRow.add(previewButton);
 
 		JButton compileButton = new JButton("Compile");
-		compileButton.addActionListener(new ActionListener()
-		{
-		  public void actionPerformed(ActionEvent e)
-		  {
-			performCompile();
-		  }
+		compileButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				performCompile();
+			}
 		});
 		buttonRow.add(compileButton);
 
