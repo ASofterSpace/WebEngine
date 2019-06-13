@@ -5,16 +5,16 @@
 package com.asofterspace.webengine;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
-import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.io.Record;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,18 +64,18 @@ public class GUI implements Runnable {
 		mainWindow.pack();
 
 		// Center the window
-        mainWindow.setLocationRelativeTo(null);
+		mainWindow.setLocationRelativeTo(null);
 
-        mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Actually display the whole jazz
-        mainWindow.setVisible(true);
+		mainWindow.setVisible(true);
 	}
 
 	private JPanel createTopPanel(JFrame parent) {
 
-	    JPanel topPanel = new JPanel();
-	    topPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		JPanel topPanel = new JPanel();
+		topPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
 		JLabel label = new JLabel(Main.PROGRAM_TITLE + " version " + Main.VERSION_NUMBER + " from " + Main.VERSION_DATE);
 		topPanel.add(label);
@@ -87,21 +87,21 @@ public class GUI implements Runnable {
 
 	private JPanel createMainPanel(JFrame parent) {
 
-	    JPanel mainPanel = new JPanel();
-	    mainPanel.setPreferredSize(new Dimension(800, 500));
-	    mainPanel.setLayout(new GridLayout(1, 2));
+		JPanel mainPanel = new JPanel();
+		mainPanel.setPreferredSize(new Dimension(800, 500));
+		mainPanel.setLayout(new GridLayout(1, 2));
 
-	    JPanel mainPanelRight = new JPanel();
-	    String[] pageList = createPageTabs(mainPanelRight);
+		JPanel mainPanelRight = new JPanel();
+		String[] pageList = createPageTabs(mainPanelRight);
 
 		pageListComponent = new JList<String>(pageList);
 
 		MouseListener pageListClickListener = new MouseListener() {
 
 			@Override
-		    public void mouseClicked(MouseEvent e) {
+			public void mouseClicked(MouseEvent e) {
 				showSelectedTab();
-		    }
+			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -146,45 +146,45 @@ public class GUI implements Runnable {
 
 	private String[] createPageTabs(JPanel parent) {
 
-		List<JSON> jsonPages = configuration.getAllContents().getArray("pages");
+		List<Record> recPages = configuration.getAllContents().getArray("pages");
 
-		pageList = new String[jsonPages.size()];
+		pageList = new String[recPages.size()];
 		pageTabs = new ArrayList<PageTab>();
 
 		int i = 0;
 
-	    for (JSON jsonPage : jsonPages) {
+		for (Record recPage : recPages) {
 
-	    	String pageTitle = jsonPage.getString("title");
+			String pageTitle = recPage.getString("title");
 
-	    	pageList[i++] = pageTitle;
+			pageList[i++] = pageTitle;
 
-			PageTab tab = new PageTab(parent, pageTitle, jsonPage.getString("path"));
+			PageTab tab = new PageTab(parent, pageTitle, recPage.getString("path"));
 
 			pageTabs.add(tab);
-	    }
+		}
 
-	    return pageList;
+		return pageList;
 	}
 
 	private JPanel createBottomPanel(JFrame parent) {
 
-	    JPanel bottomPanel = new JPanel();
-	    bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		JPanel bottomPanel = new JPanel();
+		bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-	    JButton closeButton = new JButton("Close");
-	    closeButton.addActionListener(new ActionListener()
-	    {
-	      public void actionPerformed(ActionEvent e)
-	      {
-	        System.exit(0);
-	      }
-	    });
-	    bottomPanel.add(closeButton);
+		JButton closeButton = new JButton("Close");
+		closeButton.addActionListener(new ActionListener()
+		{
+		  public void actionPerformed(ActionEvent e)
+		  {
+			System.exit(0);
+		  }
+		});
+		bottomPanel.add(closeButton);
 
 		parent.add(bottomPanel, BorderLayout.PAGE_END);
 
-	    return bottomPanel;
+		return bottomPanel;
 	}
 
 	private void showGUI() {
