@@ -6,6 +6,7 @@ package com.asofterspace.webengine;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.Utils;
 
 import javax.swing.SwingUtilities;
@@ -24,12 +25,20 @@ public class Main {
 		Utils.setVersionNumber(VERSION_NUMBER);
 		Utils.setVersionDate(VERSION_DATE);
 
-		ConfigFile config = new ConfigFile("settings");
+		ConfigFile config = null;
 
-		// create a default config file, if necessary
-		if (config.getAllContents().isEmpty()) {
+		try {
+			config = new ConfigFile("settings");
 
-			config.setAllContents(new JSON("{\"pages\": []}"));
+			// create a default config file, if necessary
+			if (config.getAllContents().isEmpty()) {
+				config.setAllContents(new JSON("{\"pages\": []}"));
+			}
+
+		} catch (JsonParseException e) {
+			System.err.println("Loading the settings failed:");
+			System.err.println(e);
+			System.exit(1);
 		}
 
 		SwingUtilities.invokeLater(new GUI(config));

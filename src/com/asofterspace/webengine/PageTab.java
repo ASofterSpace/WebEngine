@@ -9,6 +9,7 @@ import com.asofterspace.toolbox.gui.WebPreviewer;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.web.WebTemplateEngine;
 
 import java.awt.Desktop;
@@ -36,11 +37,11 @@ public class PageTab {
 	WebTemplateEngine engine;
 
 
-	public PageTab(JPanel parentPanel, String page, String pathToPage) {
+	public PageTab(JPanel parentPanel, String pageTitle, String pathToPage) throws JsonParseException {
 
 		parent = parentPanel;
 
-		title = page;
+		title = pageTitle;
 
 		path = pathToPage;
 
@@ -100,6 +101,10 @@ public class PageTab {
 		}
 
 		return title.equals(item);
+	}
+
+	public String getTitle() {
+		return title;
 	}
 
 	public void show() {

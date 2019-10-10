@@ -5,6 +5,7 @@
 package com.asofterspace.webengine;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
+import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.Record;
 
 import java.awt.BorderLayout;
@@ -148,20 +149,29 @@ public class GUI implements Runnable {
 
 		List<Record> recPages = configuration.getAllContents().getArray("pages");
 
-		pageList = new String[recPages.size()];
 		pageTabs = new ArrayList<PageTab>();
-
-		int i = 0;
 
 		for (Record recPage : recPages) {
 
 			String pageTitle = recPage.getString("title");
 
-			pageList[i++] = pageTitle;
+			try {
+				PageTab tab = new PageTab(parent, pageTitle, recPage.getString("path"));
+				pageTabs.add(tab);
 
-			PageTab tab = new PageTab(parent, pageTitle, recPage.getString("path"));
+			} catch (JsonParseException e) {
+				System.err.println("Loading the settings for " + pageTitle + " failed:");
+				System.err.println(e);
+				System.exit(1);
+			}
+		}
 
-			pageTabs.add(tab);
+		int i = 0;
+
+		pageList = new String[pageTabs.size()];
+
+		for (PageTab tab : pageTabs) {
+			pageList[i++] = tab.getTitle();
 		}
 
 		return pageList;
