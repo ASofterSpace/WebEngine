@@ -6,7 +6,7 @@ package com.asofterspace.webengine;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.JsonParseException;
-import com.asofterspace.toolbox.io.Record;
+import com.asofterspace.toolbox.utils.Record;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
