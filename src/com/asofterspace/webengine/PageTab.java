@@ -8,11 +8,9 @@ import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.WebPreviewer;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
-import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.web.WebTemplateEngine;
 
-import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.GridLayout;
@@ -124,21 +122,25 @@ public class PageTab {
 		configuration.set("version", oldVersion + 1);
 	}
 
-	private void performPreview() {
+	public boolean performPreview() {
 
 		increaseVersion();
 
-		engine.compileTo(new Directory(path + "/previews"), "", true);
+		boolean result = engine.compileTo(new Directory(path + "/previews"), "", true);
 
 		WebPreviewer.openLocalFileInBrowser(path + "/previews/index.htm");
+
+		return result;
 	}
 
-	private void performCompile() {
+	public boolean performCompile() {
 
 		increaseVersion();
 
-		engine.compileTo(new Directory(path + "/compiled"), "", false);
+		boolean result = engine.compileTo(new Directory(path + "/compiled"), "", false);
 
-		engine.compileTo(new Directory(path + "/compiledde"), "de", false);
+		result = engine.compileTo(new Directory(path + "/compiledde"), "de", false) && result;
+
+		return result;
 	}
 }

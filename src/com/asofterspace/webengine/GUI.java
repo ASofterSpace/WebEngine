@@ -38,9 +38,17 @@ public class GUI implements Runnable {
 
 	private ConfigFile configuration;
 
+	private String startupWebpage;
 
-	public GUI(ConfigFile config) {
-		configuration = config;
+	private String startupGoal;
+
+
+	public GUI(ConfigFile config, String startupWebpage, String startupGoal) {
+		this.configuration = config;
+
+		this.startupWebpage = startupWebpage;
+
+		this.startupGoal = startupGoal;
 	}
 
 	@Override
@@ -49,6 +57,35 @@ public class GUI implements Runnable {
 		createGUI();
 
 		showGUI();
+
+		if ((startupWebpage != null) && (startupGoal != null)) {
+			PageTab tab = selectTab(startupWebpage);
+			if (tab == null) {
+				System.err.println("Could not find a webpage with the name '" + startupWebpage + "'!");
+				return;
+			}
+			switch (startupGoal.toLowerCase()) {
+				case "compile":
+					if (!tab.performCompile()) {
+						System.err.println("There was an error during regular compilation of the website!");
+						System.exit(1);
+					}
+					break;
+				case "preview":
+					if (!tab.performPreview()) {
+						System.err.println("There was an error during preview compilation of the website!");
+						System.exit(1);
+					}
+					break;
+				default:
+					System.err.println("Did not understand the goal '" + startupGoal + "' - please use " +
+						"compile or preview instead!");
+					return;
+			}
+			System.out.println("Executed " + startupGoal + " for webpage '" + startupWebpage +
+				"', shutting down...");
+			System.exit(0);
+		}
 	}
 
 	private void createGUI() {
@@ -136,13 +173,23 @@ public class GUI implements Runnable {
 
 		String selectedItem = (String) pageListComponent.getSelectedValue();
 
+		selectTab(selectedItem);
+	}
+
+	private PageTab selectTab(String tabName) {
+
+		PageTab result = null;
+
 		for (PageTab tab : pageTabs) {
-			if (tab.isItem(selectedItem)) {
+			if (tab.isItem(tabName)) {
 				tab.show();
+				result = tab;
 			} else {
 				tab.hide();
 			}
 		}
+
+		return result;
 	}
 
 	private String[] createPageTabs(JPanel parent) {
