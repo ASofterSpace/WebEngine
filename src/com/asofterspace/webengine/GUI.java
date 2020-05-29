@@ -71,6 +71,22 @@ public class GUI implements Runnable {
 						System.exit(1);
 					}
 					break;
+				case "upload":
+					if (!tab.performUpload()) {
+						System.err.println("There was an error during uploading to the website!");
+						System.exit(1);
+					}
+					break;
+				case "compileandupload":
+					if (!tab.performCompile()) {
+						System.err.println("There was an error during regular compilation of the website!");
+						System.exit(1);
+					}
+					if (!tab.performUpload()) {
+						System.err.println("There was an error during uploading to the website!");
+						System.exit(1);
+					}
+					break;
 				case "preview":
 					if (!tab.performPreview()) {
 						System.err.println("There was an error during preview compilation of the website!");
@@ -79,7 +95,7 @@ public class GUI implements Runnable {
 					break;
 				default:
 					System.err.println("Did not understand the goal '" + startupGoal + "' - please use " +
-						"compile or preview instead!");
+						"compile, upload, compileAndUpload or preview instead!");
 					return;
 			}
 			System.out.println("Executed " + startupGoal + " for webpage '" + startupWebpage +
@@ -126,7 +142,7 @@ public class GUI implements Runnable {
 	private JPanel createMainPanel(JFrame parent) {
 
 		JPanel mainPanel = new JPanel();
-		mainPanel.setPreferredSize(new Dimension(800, 500));
+		mainPanel.setPreferredSize(new Dimension(1000, 600));
 		mainPanel.setLayout(new GridLayout(1, 2));
 
 		JPanel mainPanelRight = new JPanel();

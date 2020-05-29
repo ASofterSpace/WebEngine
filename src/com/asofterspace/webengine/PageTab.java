@@ -2,18 +2,22 @@
  * Unlicensed code created by A Softer Space, 2019
  * www.asofterspace.com/licenses/unlicense.txt
  */
- package com.asofterspace.webengine;
+package com.asofterspace.webengine;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.WebPreviewer;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
+import com.asofterspace.toolbox.io.IoUtils;
 import com.asofterspace.toolbox.io.JsonParseException;
+import com.asofterspace.toolbox.io.TextFile;
+import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.web.WebTemplateEngine;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.GridLayout;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -21,6 +25,9 @@ import javax.swing.JPanel;
 
 
 public class PageTab {
+
+	private final static String UPLOAD_STR_EN = "uploadStrEN";
+	private final static String UPLOAD_STR_DE = "uploadStrDE";
 
 	JPanel parent;
 
@@ -87,6 +94,15 @@ public class PageTab {
 		});
 		buttonRow.add(compileButton);
 
+		JButton compileUploadButton = new JButton("Compile and Upload");
+		compileUploadButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				performCompile();
+				performUpload();
+			}
+		});
+		buttonRow.add(compileUploadButton);
+
 		tab.setVisible(false);
 
 		return tab;
@@ -142,5 +158,53 @@ public class PageTab {
 		result = engine.compileTo(new Directory(path + "/compiledde"), "de", false) && result;
 
 		return result;
+	}
+
+	public boolean performUpload() {
+
+		Directory enDir = new Directory(path + "/compiled");
+		Directory deDir = new Directory(path + "/compiledde");
+
+		Record engineConf = engine.getConfig();
+
+		List<String> files = engineConf.getArrayAsStringList("files");
+
+		StringBuilder enBatch = new StringBuilder();
+		StringBuilder deBatch = new StringBuilder();
+
+		for (String file : files) {
+			if (file.endsWith(".php")) {
+				String folder = "";
+				if (file.contains("/")) {
+					folder = file.substring(0, file.lastIndexOf("/") + 1);
+				}
+				enBatch.append("cd /var/www/html/asofterspaceen/" + folder + "\r\n");
+				enBatch.append("put ");
+				enBatch.append((new File(enDir, file)).getAbsoluteFilename());
+				enBatch.append("\r\n");
+				deBatch.append("cd /var/www/html/asofterspacede/" + folder + "\r\n");
+				deBatch.append("put ");
+				deBatch.append((new File(deDir, file)).getAbsoluteFilename());
+				deBatch.append("\r\n");
+			}
+		}
+
+		enBatch.append("quit");
+		deBatch.append("quit");
+
+		Directory tempDir = new Directory(path + "/temp");
+		tempDir.clear();
+
+		TextFile enBatchFile = new TextFile(tempDir, "en.bat");
+		enBatchFile.saveContent(enBatch);
+		TextFile deBatchFile = new TextFile(tempDir, "de.bat");
+		deBatchFile.saveContent(deBatch);
+
+		IoUtils.execute(engineConf.getString(UPLOAD_STR_EN) + enBatchFile.getAbsoluteFilename());
+		IoUtils.execute(engineConf.getString(UPLOAD_STR_DE) + deBatchFile.getAbsoluteFilename());
+
+		System.out.println("Uploaded all PHP files both into DE and into EN directories on the server!");
+
+		return true;
 	}
 }
