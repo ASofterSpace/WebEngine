@@ -200,7 +200,13 @@ public class PageTab {
 		TextFile deBatchFile = new TextFile(tempDir, "de.bat");
 		deBatchFile.saveContent(deBatch);
 
+		System.out.println("Starting to upload PHP files both into DE and into EN directories on the server...");
+		System.out.println("Starting with EN...");
+
 		IoUtils.execute(engineConf.getString(UPLOAD_STR_EN) + enBatchFile.getAbsoluteFilename());
+
+		System.out.println("Done with EN, continuing with DE...");
+
 		IoUtils.execute(engineConf.getString(UPLOAD_STR_DE) + deBatchFile.getAbsoluteFilename());
 
 		System.out.println("Uploaded all PHP files both into DE and into EN directories on the server!");
