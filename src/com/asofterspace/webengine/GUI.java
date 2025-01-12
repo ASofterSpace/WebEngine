@@ -49,6 +49,11 @@ public class GUI implements Runnable {
 		this.startupWebpage = startupWebpage;
 
 		this.startupGoal = startupGoal;
+
+		// enable anti-aliasing for swing
+		System.setProperty("swing.aatext", "true");
+		// enable anti-aliasing for awt
+		System.setProperty("awt.useSystemAAFontSettings", "on");
 	}
 
 	@Override

@@ -15,8 +15,8 @@ import javax.swing.SwingUtilities;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "WebEngine";
-	public final static String VERSION_NUMBER = "0.0.0.9(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "4. October 2017 - 11. April 2020";
+	public final static String VERSION_NUMBER = "0.0.1.0(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "4. October 2017 - 12. January 2025";
 
 	public static void main(String[] args) {
 
@@ -51,8 +51,8 @@ public class Main {
 			}
 		} else {
 			System.out.println("Not performing anything automatically (if you would like to do something " +
-				" automatically, use the webpage name as first argument and the goal (compile or previs) " +
-				" as second argument.)");
+				"automatically, use the webpage name as first argument and the goal (compile or previs) " +
+				"as second argument.)");
 		}
 
 		ConfigFile config = null;

@@ -172,25 +172,34 @@ public class PageTab {
 		StringBuilder enBatch = new StringBuilder();
 		StringBuilder deBatch = new StringBuilder();
 
+		StringBuilder enBash = new StringBuilder();
+		StringBuilder deBash = new StringBuilder();
+
 		for (String file : files) {
 			if (file.endsWith(".php")) {
 				String folder = "";
 				if (file.contains("/")) {
 					folder = file.substring(0, file.lastIndexOf("/") + 1);
 				}
-				enBatch.append("cd /var/www/html/asofterspaceen/" + folder + "\r\n");
-				enBatch.append("put ");
-				enBatch.append((new File(enDir, file)).getAbsoluteFilename());
-				enBatch.append("\r\n");
-				deBatch.append("cd /var/www/html/asofterspacede/" + folder + "\r\n");
-				deBatch.append("put ");
-				deBatch.append((new File(deDir, file)).getAbsoluteFilename());
-				deBatch.append("\r\n");
+				appendAll("cd /var/www/html/asofterspace", enBatch, deBatch, enBash, deBash, false);
+				enBatch.append("en");
+				deBatch.append("de");
+				enBash.append("en");
+				deBash.append("de");
+				appendAll("/", enBatch, deBatch, enBash, deBash, false);
+				appendAll(folder, enBatch, deBatch, enBash, deBash, true);
+				appendAll("put ", enBatch, deBatch, enBash, deBash, false);
+				String enDirFilePath = (new File(enDir, file)).getAbsoluteFilename();
+				String deDirFilePath = (new File(deDir, file)).getAbsoluteFilename();
+				enBatch.append(enDirFilePath);
+				deBatch.append(deDirFilePath);
+				enBash.append(enDirFilePath);
+				deBash.append(deDirFilePath);
+				appendAll("", enBatch, deBatch, enBash, deBash, true);
 			}
 		}
 
-		enBatch.append("quit");
-		deBatch.append("quit");
+		appendAll("quit", enBatch, deBatch, enBash, deBash, false);
 
 		Directory tempDir = new Directory(path + "/temp");
 		tempDir.clear();
@@ -199,6 +208,11 @@ public class PageTab {
 		enBatchFile.saveContent(enBatch);
 		TextFile deBatchFile = new TextFile(tempDir, "de.bat");
 		deBatchFile.saveContent(deBatch);
+
+		TextFile enBashFile = new TextFile(tempDir, "en.sh");
+		enBashFile.saveContent(enBash);
+		TextFile deBashFile = new TextFile(tempDir, "de.sh");
+		deBashFile.saveContent(deBash);
 
 		System.out.println("Starting to upload PHP files both into DE and into EN directories on the server...");
 		System.out.println("Starting with EN...");
@@ -212,5 +226,18 @@ public class PageTab {
 		System.out.println("Uploaded all PHP files both into DE and into EN directories on the server!");
 
 		return true;
+	}
+
+	private static void appendAll(String str, StringBuilder enBatch, StringBuilder deBatch, StringBuilder enBash, StringBuilder deBash, boolean newLine) {
+		enBatch.append(str);
+		deBatch.append(str);
+		enBash.append(str);
+		deBash.append(str);
+		if (newLine) {
+			enBatch.append("\r\n");
+			deBatch.append("\r\n");
+			enBash.append("\n");
+			deBash.append("\n");
+		}
 	}
 }
